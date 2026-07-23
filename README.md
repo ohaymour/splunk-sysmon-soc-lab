@@ -7,7 +7,7 @@ Extended the existing Stealthwork Active Directory lab with a centralized securi
 ## Environment
 
 - **Hypervisor:** VMware Workstation Pro
-- **New host:** `SPLK01` — Ubuntu Server 26.04 LTS, 2 vCPU, 8GB RAM, 60GB disk
+- **New host:** `SPLK01` — Ubuntu Server 26.04 LTS, 2 vCPU, 8GB RAM, 40GB disk
 - **Network:** `VMnet2` (host-only, 192.168.10.0/24) — same lab network as the Stealthwork environment
 - **Existing hosts (unchanged from Stealthwork):** `DC01` (192.168.10.10), `FS01` (192.168.10.20)
 - **Splunk:** Splunk Enterprise (free license) on SPLK01, Splunk Universal Forwarder on DC01 and FS01
@@ -33,12 +33,12 @@ See [`/diagrams/network-topology.svg`](diagrams/network-topology.svg) for the ne
 ### Endpoint Telemetry
 
 - Installed Sysmon on both DC01 and FS01 using the industry-standard SwiftOnSecurity configuration.
-- Installed the Splunk Universal Forwarder on both servers, configured to monitor the Security, System, and Application Windows Event Logs plus the Sysmon Operational log, and forward to SPLK01 on port 9997 (see [`/scripts/inputs.conf`](scripts/inputs.conf)).
+- Installed the Splunk Universal Forwarder on both servers, configured to monitor the Security, System, and Application Windows Event Logs plus the Sysmon Operational log, and forward to SPLK01 on port 9997 (see [`/scripts/inputs.conf`](scripts/inputs.conf), applied via [`/scripts/Setup-SysmonAndForwarder.ps1`](scripts/Setup-SysmonAndForwarder.ps1)).
 - **Note:** DC01 and FS01 required different approaches — DC01 has its own internet access (for WSUS, from the original Stealthwork build) so downloads happened directly; FS01 has no internet access by design, so installer files were transferred in via RDP clipboard copy from the host machine.
 
 ### Detections and Dashboard
 
-Built four detections, each mapped to a MITRE ATT&CK technique, saved as Splunk reports and surfaced on a "Security Monitoring Overview" dashboard. Full detail in [`/docs/Detections-and-MITRE-Mapping.md`](docs/Detections-and-MITRE-Mapping.md) and the raw SPL in [`/scripts/detections.spl`](scripts/detections.spl):
+Built four detections, each mapped to a MITRE ATT&CK technique, saved as Splunk reports and surfaced on a "Security Monitoring Overview" dashboard. Full detail in [`/docs/Full-Implementation-Guide.md`](docs/Full-Implementation-Guide.md#detections-and-dashboard) and the raw SPL in [`/scripts/detections.spl`](scripts/detections.spl):
 
 | Detection | MITRE ATT&CK |
 |---|---|
@@ -49,7 +49,7 @@ Built four detections, each mapped to a MITRE ATT&CK technique, saved as Splunk 
 
 ## Challenges & Troubleshooting
 
-Six real issues came up during this build — full detail on all of them in [`/docs/Troubleshooting-Log.md`](docs/Troubleshooting-Log.md). The most significant:
+Six real issues came up during this build — full detail on all of them in [`/docs/Full-Implementation-Guide.md`](docs/Full-Implementation-Guide.md#challenges-and-troubleshooting). The most significant:
 
 **1. Ambiguous virtual network configuration (occurred twice, independently)**
 
