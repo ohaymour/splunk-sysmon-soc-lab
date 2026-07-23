@@ -1,0 +1,26 @@
+# Static IP configuration for SPLK01's Host-only adapter (ens33)
+# File location on SPLK01: /etc/netplan/00-installer-config.yaml
+#
+# NOTE: This lab's actual host-only virtual network is VMnet2 - confirmed
+# via host PC ipconfig after DC01 and FS01 were both independently found
+# to be misconfigured onto the wrong vSwitch when left on the ambiguous
+# plain "Host-only" VMware setting. See docs/Troubleshooting-Log.md for
+# the full diagnostic story. ens34 (second adapter, NAT) is intentionally
+# left on DHCP for internet access and is not configured here.
+
+network:
+  ethernets:
+    ens33:
+      dhcp4: false
+      dhcp6: false
+      match:
+        macaddress: 00:0c:29:f5:bf:d0
+      set-name: ens33
+      addresses: [192.168.10.30/24]
+      nameservers:
+        addresses: [192.168.10.10]
+    ens34:
+      accept-ra: true
+      dhcp4: true
+      dhcp6: true
+  version: 2

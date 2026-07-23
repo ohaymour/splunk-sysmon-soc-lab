@@ -1,0 +1,24 @@
+# Splunk detections built for the Security Monitoring Lab
+# Each saved as a Report in Splunk Web: Settings > Searches, Reports, and Alerts
+
+# --- Detect - Repeated Failed Logons ---
+# MITRE ATT&CK: T1110 (Brute Force)
+# Flags any account/source-IP pair with more than 5 failed logon attempts.
+index=wineventlog EventCode=4625 | stats count by Account_Name, src_ip | where count > 5
+
+# --- Detect - Privileged Group Change ---
+# MITRE ATT&CK: T1098 (Account Manipulation)
+# Flags any addition to the GRP_Admins security group.
+index=wineventlog EventCode IN (4728, 4732, 4756) Group_Name="GRP_Admins"
+
+# --- Detect - Suspicious PowerShell ---
+# MITRE ATT&CK: T1059.001 (Command and Scripting Interpreter: PowerShell)
+# Flags PowerShell execution using common obfuscation/bypass flags.
+index=sysmon EventCode=1 Image="*powershell.exe" (CommandLine="*-enc*" OR CommandLine="*-nop*")
+
+# --- Detect - External RDP Logon ---
+# Flags any RDP logon (Logon_Type=10) originating from outside the lab
+# subnet. Ties directly to the Lab-RDP-Hardening GPO from the Stealthwork
+# project, which restricts RDP access to 192.168.10.0/24 at the firewall
+# level - this detection is the monitoring-side complement to that control.
+index=wineventlog EventCode=4624 Logon_Type=10 NOT src_ip="192.168.10.*"
